@@ -1,0 +1,47 @@
+{
+  "name": "static-noise",
+  "displayName": "Static Noise",
+  "description": "Static Noise dark color theme for Visual Studio Code.",
+  "version": "0.0.1",
+  "publisher": "hcastillaq",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hcastillaq/static-noise.vscode.git"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Themes"
+  ],
+  "keywords": [
+    "theme",
+    "dark theme",
+    "static noise",
+    "color theme"
+  ],
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#0F1117",
+    "theme": "dark"
+  },
+  "contributes": {
+    "themes": [
+      {
+        "label": "Static Noise",
+        "uiTheme": "vs-dark",
+        "path": "./themes/static-noise-color-theme.json"
+      }
+    ]
+  },
+  "scripts": {
+    "validate-theme": "node scripts/validate-theme.mjs",
+    "test": "node --test",
+    "package": "npm run validate-theme && vsce package --out dist/static-noise-${npm_package_version}.vsix",
+    "sync-upstream": "node scripts/sync-upstream.mjs"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^3.7.0"
+  }
+}

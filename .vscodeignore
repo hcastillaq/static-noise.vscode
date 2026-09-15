@@ -1,0 +1,12 @@
+.DS_Store
+.github/**
+.gitignore
+.vscodeignore
+assets/**
+docs/**
+dist/**
+node_modules/**
+scripts/**
+test/**
+UPSTREAM.md
+*.vsix
