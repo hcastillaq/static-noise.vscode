@@ -1,0 +1,47 @@
+name: Sync Static Noise
+
+on:
+  repository_dispatch:
+    types: [static-noise-release]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Full Static Noise commit SHA
+        required: true
+        type: string
+      version:
+        description: Static Noise version without v
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: static-noise-sync
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - name: Synchronize the generated theme
+        env:
+          STATIC_NOISE_SHA: ${{ github.event.client_payload.sha || inputs.sha }}
+          STATIC_NOISE_VERSION: ${{ github.event.client_payload.version || inputs.version }}
+        run: npm run sync-upstream
+      - run: npm test && npm run package
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: chore/sync-static-noise-${{ github.event.client_payload.version || inputs.version }}
+          delete-branch: true
+          commit-message: 'chore: sync Static Noise v${{ github.event.client_payload.version || inputs.version }}'
+          title: 'chore: sync Static Noise v${{ github.event.client_payload.version || inputs.version }}'
+          body: |
+            Synchronizes the VS Code theme from the immutable Static Noise commit `${{ github.event.client_payload.sha || inputs.sha }}`.
