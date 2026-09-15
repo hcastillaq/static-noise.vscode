@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Ideation: Static Noise para VS Code</title>
+  <style>
+    :root { --void:#0F1117; --surface:#141720; --card:#1A1E2B; --border:#272C3E; --text:#E6E2D6; --muted:#9299AE; --dim:#62697B; --cyan:#72EAD5; --blue:#83BFFF; --purple:#C2A7FF; --green:#A3D98B; --yellow:#EDD071; --orange:#F3A261; --red:#EF7785; }
+    * { box-sizing:border-box; } body { margin:0; background:var(--void); color:var(--text); font:16px/1.55 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    main { max-width:920px; margin:auto; padding:48px 24px 72px; } header { border-bottom:1px solid var(--border); padding-bottom:28px; } .eyebrow { color:var(--cyan); font-size:.76rem; font-weight:750; letter-spacing:.11em; text-transform:uppercase; } h1 { font-size:clamp(2rem,5vw,3.25rem); line-height:1.08; margin:.35rem 0 .8rem; } h2 { margin-top:3.2rem; font-size:1.55rem; } h3 { margin:.3rem 0 .7rem; font-size:1.2rem; } p { max-width:72ch; } .meta,.stats,.jump { display:flex; flex-wrap:wrap; gap:.55rem; margin-top:1rem; } .chip { background:#193C3B; border:1px solid #2B6660; border-radius:999px; color:var(--text); font-size:.84rem; padding:.25rem .65rem; } .stats .chip { background:#20344D; border-color:#385a83; } .callout { background:#20344D; border:1px solid #385a83; border-radius:10px; padding:16px 18px; } .axis-list { columns:2; padding-left:1.2rem; } .jump { display:block; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 18px; } .jump li { margin:.35rem 0; } a { color:var(--cyan); } article { background:var(--surface); border:1px solid var(--border); border-radius:12px; margin:18px 0; padding:22px; } .rank { color:var(--cyan); font-weight:800; } dl { display:grid; grid-template-columns:130px 1fr; gap:.45rem 1rem; margin:1rem 0 0; } dt { color:var(--muted); font-size:.78rem; font-weight:750; letter-spacing:.08em; } dd { margin:0; } code { color:var(--yellow); } table { width:100%; border-collapse:collapse; background:var(--surface); } th,td { border:1px solid var(--border); padding:.7rem; text-align:left; vertical-align:top; } th { color:var(--muted); } footer { border-top:1px solid var(--border); color:var(--muted); font-size:.86rem; margin-top:3.5rem; padding-top:1.4rem; } @media (max-width:620px) { .axis-list { columns:1; } dl { grid-template-columns:1fr; gap:.15rem; } dd { margin-bottom:.65rem; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">Ideación</div>
+    <h1>Static Noise para VS Code</h1>
+    <p>Empaquetar Static Noise como extensión independiente de VS Code. La paleta y la plantilla aguas arriba siguen siendo la fuente de verdad; este repositorio distribuye temas ya generados.</p>
+    <div class="meta"><span class="chip">Fecha: 2026-09-15</span><span class="chip">Tema: static-noise-vscode-theme-packaging</span><span class="chip">Modo: repositorio</span></div>
+    <div class="stats"><span class="chip">6 direcciones finalistas</span><span class="chip">Sin cambios de paleta</span><span class="chip">Sin semanticTokenColors</span></div>
+  </header>
+
+  <section id="grounding-context">
+    <h2>Grounding Context</h2>
+    <p>El repositorio fuente ya contiene <code>palette.json</code>, <code>templates/vscode.json.template</code> y un compilador que genera <code>dist/vscode/static-noise-color-theme.json</code>. El repositorio destino está vacío. Una extensión de tema debe declarar <code>contributes.themes</code>, incluir los JSON de tema y empaquetarse como VSIX sin compilación al abrir VS Code.</p>
+    <div class="callout"><strong>Decisión de alcance:</strong> este paquete reutiliza los colores y los <code>tokenColors</code> TextMate existentes. Cualquier trabajo sobre <code>semanticTokenColors</code> pertenece al repositorio Static Noise, no a este consumidor.</div>
+  </section>
+
+  <section id="topic-axes">
+    <h2>Topic Axes</h2>
+    <ul class="axis-list">
+      <li>Sincronización con Static Noise</li>
+      <li>Forma inicial del catálogo de temas</li>
+      <li>Contrato de empaquetado VSIX</li>
+      <li>Control de deriva de artefactos</li>
+      <li>Distribución y publicación</li>
+    </ul>
+  </section>
+
+  <section id="ranked-ideas">
+    <h2>Ranked Ideas</h2>
+    <ol class="jump">
+      <li><a href="#i1">I1. Consumidor mínimo con build reproducible</a></li>
+      <li><a href="#i2">I2. Tema canónico único para la primera versión</a></li>
+      <li><a href="#i3">I3. Artefacto generado y guardia contra deriva</a></li>
+      <li><a href="#i4">I4. Límite de distribución explícito</a></li>
+      <li><a href="#i5">I5. Matriz de variantes por roles, no por colores</a></li>
+      <li><a href="#i6">I6. Una VSIX para dos registros</a></li>
+    </ol>
+
+    <article id="i1">
+      <div class="rank">I1.</div><h3>Consumidor mínimo con build reproducible</h3>
+      <p>El repositorio se limita a manifest, documentación, activos del paquete, un script pequeño de Node y <code>themes/</code>. El script toma la paleta y plantilla de una versión fijada de Static Noise y genera el JSON distribuido, sin redefinir hexadecimales ni introducir un segundo sistema de tokens.</p>
+      <dl><dt>EJE</dt><dd>Sincronización con Static Noise</dd><dt>BASIS</dt><dd><code>direct:</code> el upstream ya resuelve plantillas desde <code>palette.json</code>; los temas de referencia versionan su fuente y el JSON generado.</dd><dt>RATIONALE</dt><dd>La actualización queda explícita y revisable, mientras el usuario instala un artefacto estático.</dd><dt>DOWNSIDES</dt><dd>Hay que decidir y documentar el mecanismo de entrada: paquete npm fijado, snapshot Git o copia sincronizada.</dd><dt>CONFIDENCE</dt><dd>92%</dd><dt>COMPLEXITY</dt><dd>Medium</dd></dl>
+    </article>
+
+    <article id="i2">
+      <div class="rank">I2.</div><h3>Tema canónico único para la primera versión</h3>
+      <p>La extensión inicial publica solo <strong>Static Noise</strong>, generado directamente desde la plantilla existente. No intenta resolver OLED, modo suave ni alto contraste antes de comprobar que el contrato de sincronización, empaquetado e instalación funciona de punta a punta.</p>
+      <dl><dt>EJE</dt><dd>Forma inicial del catálogo de temas</dd><dt>BASIS</dt><dd><code>direct:</code> el upstream dispone de una paleta canónica y una sola plantilla de VS Code.</dd><dt>RATIONALE</dt><dd>Evita que el primer release convierta un empaquetador en un generador de sabores sin una definición de producto.</dd><dt>DOWNSIDES</dt><dd>Los usuarios que quieran otra topología visual tendrán que esperar a una variante deliberada.</dd><dt>CONFIDENCE</dt><dd>94%</dd><dt>COMPLEXITY</dt><dd>Low</dd></dl>
+    </article>
+
+    <article id="i3">
+      <div class="rank">I3.</div><h3>Artefacto generado y guardia contra deriva</h3>
+      <p>El JSON bajo <code>themes/</code> se versiona y el proyecto añade una comprobación que reconstruye el tema y falla si existe diferencia. Así las revisiones muestran exactamente qué cambiará en el editor y ningún colaborador puede corregir el JSON empaquetado a mano.</p>
+      <dl><dt>EJE</dt><dd>Control de deriva de artefactos</dd><dt>BASIS</dt><dd><code>external:</code> proyectos como Primer y Catppuccin versionan la salida y verifican que la generación no deje diferencias.</dd><dt>RATIONALE</dt><dd>Protege la fuente de verdad sin obligar al Marketplace ni al editor a ejecutar el compilador.</dd><dt>DOWNSIDES</dt><dd>La contribución exige ejecutar el build antes de actualizar la salida.</dd><dt>CONFIDENCE</dt><dd>91%</dd><dt>COMPLEXITY</dt><dd>Low</dd></dl>
+    </article>
+
+    <article id="i4">
+      <div class="rank">I4.</div><h3>Límite de distribución explícito</h3>
+      <p>El VSIX contiene solamente el manifiesto, licencia, README, icono PNG y los temas generados. <code>.vscodeignore</code> deja fuera scripts, fuentes de compilación, pruebas y configuraciones de desarrollo; un chequeo de preempaquetado revisa tanto el manifiesto como la lista final de archivos.</p>
+      <dl><dt>EJE</dt><dd>Contrato de empaquetado VSIX</dd><dt>BASIS</dt><dd><code>external:</code> la documentación de publicación de VS Code y <code>vsce</code> valida manifiesto, icono PNG y contenido distribuido.</dd><dt>RATIONALE</dt><dd>Se detectan errores de publicación antes de credenciales o registros externos y el paquete queda pequeño.</dd><dt>DOWNSIDES</dt><dd>Las reglas de exclusión necesitan revisarse cuando se agregue un nuevo activo de runtime.</dd><dt>CONFIDENCE</dt><dd>89%</dd><dt>COMPLEXITY</dt><dd>Low</dd></dl>
+    </article>
+
+    <article id="i5">
+      <div class="rank">I5.</div><h3>Matriz de variantes por roles, no por colores</h3>
+      <p>Después del release canónico, una variante como <em>Void</em> puede reasignar roles de superficie ya existentes —por ejemplo, promover <code>void</code> y reservar <code>surface</code> para elevación— sin modificar los tokens de sintaxis. Las variantes se definen como transformaciones declarativas y se registran como temas separados.</p>
+      <dl><dt>EJE</dt><dd>Forma inicial del catálogo de temas</dd><dt>BASIS</dt><dd><code>reasoned:</code> la paleta ya diferencia <code>void</code>, <code>surface</code> y <code>card</code>; VS Code permite varios temas por extensión.</dd><dt>RATIONALE</dt><dd>Amplía el catálogo sin bifurcar la paleta ni duplicar la configuración sintáctica.</dd><dt>DOWNSIDES</dt><dd>Debe esperar a que el tema canónico establezca pruebas visuales y una razón clara para cada variante.</dd><dt>CONFIDENCE</dt><dd>76%</dd><dt>COMPLEXITY</dt><dd>Medium</dd></dl>
+    </article>
+
+    <article id="i6">
+      <div class="rank">I6.</div><h3>Una VSIX para dos registros</h3>
+      <p>El pipeline de release crea una sola VSIX validada localmente. Esa misma salida se publica, cuando el proyecto esté listo, en Visual Studio Marketplace y Open VSX; las credenciales y reintentos permanecen separados para que un fallo de un registro no cambie el binario ni bloquee el otro.</p>
+      <dl><dt>EJE</dt><dd>Distribución y publicación</dd><dt>BASIS</dt><dd><code>external:</code> ambos registros aceptan la misma VSIX, aunque exigen cuentas y tokens distintos.</dd><dt>RATIONALE</dt><dd>Cursor, VSCodium y entornos basados en Open VSX pueden instalar el mismo tema publicado para VS Code.</dd><dt>DOWNSIDES</dt><dd>No aporta valor al primer build local; depende de que existan cuentas de publicación.</dd><dt>CONFIDENCE</dt><dd>82%</dd><dt>COMPLEXITY</dt><dd>Medium</dd></dl>
+    </article>
+  </section>
+
+  <section id="rejection-summary">
+    <h2>Rejection Summary</h2>
+    <table><thead><tr><th>Idea</th><th>Razón</th></tr></thead><tbody>
+      <tr><td>Sincronización por <code>repository_dispatch</code></td><td>Depende de automatización y permisos en el upstream que todavía no existen.</td></tr>
+      <tr><td>Ingesta directa sin mecanismo de build</td><td>Puede consumir el JSON generado del upstream, pero no define aún una actualización verificable ni el límite de mantenimiento del consumidor.</td></tr>
+      <tr><td>Variantes Void, Soft y alto contraste desde el primer release</td><td>Mezcla la validación del empaquetado con decisiones de producto y corre el riesgo de crear un catálogo sin criterios.</td></tr>
+      <tr><td>Negro puro y nuevos hexadecimales</td><td>Rompe la decisión de conservar Static Noise como fuente de verdad.</td></tr>
+      <tr><td>Generación de branding vectorial</td><td>No hay un activo fuente establecido y no resuelve el objetivo de empaquetar el tema.</td></tr>
+      <tr><td><code>semanticTokenColors</code></td><td>Queda diferido explícitamente al repositorio upstream Static Noise.</td></tr>
+    </tbody></table>
+  </section>
+
+  <footer>Compuesto 2026-09-15T21:20Z por ce-ideate a partir del repositorio <code>hcastillaq/static-noise</code> y la documentación de VS Code.</footer>
+</main>
+</body>
+</html>
