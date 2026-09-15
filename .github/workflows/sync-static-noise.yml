@@ -34,6 +34,7 @@ jobs:
         env:
           STATIC_NOISE_SHA: ${{ github.event.client_payload.sha || inputs.sha }}
           STATIC_NOISE_VERSION: ${{ github.event.client_payload.version || inputs.version }}
+          STATIC_NOISE_BOOTSTRAP: ${{ github.event.client_payload.bootstrap && 'true' || 'false' }}
         run: npm run sync-upstream
       - run: npm test && npm run package
       - uses: peter-evans/create-pull-request@v7

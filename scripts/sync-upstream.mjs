@@ -4,6 +4,7 @@ import process from 'node:process';
 
 const sha = process.env.STATIC_NOISE_SHA;
 const version = process.env.STATIC_NOISE_VERSION;
+const bootstrap = process.env.STATIC_NOISE_BOOTSTRAP === 'true';
 
 if (!/^[0-9a-f]{40}$/i.test(sha ?? '')) {
   throw new Error('STATIC_NOISE_SHA must be a full 40-character commit SHA.');
@@ -27,7 +28,9 @@ const packagePath = path.join(root, 'package.json');
 const extensionPackage = JSON.parse(await readFile(packagePath, 'utf8'));
 const versionMatch = /^(\d+)\.(\d+)\.(\d+)(?:-.+)?$/.exec(extensionPackage.version);
 if (!versionMatch) throw new Error(`Unsupported extension version: ${extensionPackage.version}`);
-const extensionVersion = `${versionMatch[1]}.${versionMatch[2]}.${Number(versionMatch[3]) + 1}`;
+const extensionVersion = bootstrap
+  ? extensionPackage.version
+  : `${versionMatch[1]}.${versionMatch[2]}.${Number(versionMatch[3]) + 1}`;
 extensionPackage.version = extensionVersion;
 await writeFile(packagePath, `${JSON.stringify(extensionPackage, null, 2)}\n`);
 
@@ -37,4 +40,4 @@ lock.version = extensionVersion;
 if (lock.packages?.['']) lock.packages[''].version = extensionVersion;
 await writeFile(lockPath, `${JSON.stringify(lock, null, 2)}\n`);
 
-console.log(`Synchronized VS Code theme from Static Noise v${version} (${sha}); extension is now v${extensionVersion}.`);
+console.log(`Synchronized VS Code theme from Static Noise v${version} (${sha}); extension ${bootstrap ? 'remains' : 'is now'} v${extensionVersion}.`);
