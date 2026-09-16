@@ -27,5 +27,5 @@ jobs:
       - name: Publish VSIX to GitHub Releases
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/static-noise-${{ github.ref_name }}.vsix
+          files: dist/*.vsix
           generate_release_notes: true
