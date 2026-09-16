@@ -18,7 +18,10 @@ export async function validateThemeManifest(manifestPath) {
 
     const themePath = path.resolve(path.dirname(manifestPath), theme.path);
     await stat(themePath);
-    JSON.parse(await readFile(themePath, 'utf8'));
+    const themeJson = JSON.parse(await readFile(themePath, 'utf8'));
+    if (!themeJson.name || !themeJson.type || !themeJson.colors) {
+      throw new Error(`Theme at ${theme.path} is missing required fields (name, type, or colors).`);
+    }
   }
 }
 

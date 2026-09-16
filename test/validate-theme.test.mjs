@@ -10,11 +10,14 @@ test('accepts a manifest whose theme path exists and contains JSON', async () =>
   await validateThemeManifest(path.resolve('package.json'));
 });
 
-test('preserves upstream TextMate tokens without local semantic token rules', async () => {
+test('preserves upstream TextMate tokens and supports semantic token rules', async () => {
   const theme = JSON.parse(await readFile('themes/static-noise-color-theme.json', 'utf8'));
 
   assert.ok(Array.isArray(theme.tokenColors));
-  assert.equal(Object.hasOwn(theme, 'semanticTokenColors'), false);
+  assert.equal(theme.semanticHighlighting, true);
+  if (Object.hasOwn(theme, 'semanticTokenColors')) {
+    assert.ok(typeof theme.semanticTokenColors === 'object' && theme.semanticTokenColors !== null);
+  }
 });
 
 test('rejects a manifest whose theme path is missing', async () => {
