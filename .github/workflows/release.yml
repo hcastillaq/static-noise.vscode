@@ -1,0 +1,31 @@
+name: Release VSIX
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Verify tag and extension version match
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          test "v$(node -p "require('./package.json').version")" = "$TAG"
+      - run: npm test
+      - run: npm run package
+      - name: Publish VSIX to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/static-noise-${{ github.ref_name }}.vsix
+          generate_release_notes: true
