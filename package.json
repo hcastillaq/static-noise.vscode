@@ -2,7 +2,7 @@
   "name": "static-noise",
   "displayName": "Static Noise",
   "description": "Static Noise dark color theme for Visual Studio Code.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "hcastillaq",
   "license": "MIT",
   "repository": {
